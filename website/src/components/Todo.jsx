@@ -7,11 +7,11 @@ const Todo = () => {
   const { fetchTodos, addTodo, removeTodo, updateTodo } = useTodos();
   const queryClient = useQueryClient();
   const addMutation = useMutation(addTodo, {
-    // onSuccess: () => {
-    //   queryClient.invalidateQueries("todos");
-    // },
-    onMutate: () => {
-      console.log("onMutate");
+    onMutate: async (todo) => {
+      await queryClient.cancelQueries(["todos"]);
+      const previousTodos = queryClient.getQueryData(["todos"]);
+      queryClient.setQueryData(["todos", (old) => [...old, todo]]);
+      return { previousTodos };
     },
     onSuccess: (data, variables, context) => {
       console.log("data", data);
@@ -20,10 +20,10 @@ const Todo = () => {
       console.log("onSuccess");
     },
     onError: () => {
-      console.log("onError");
+      queryClient.setQueryData(["todos"], context.previousTodos);
     },
     onSettled: () => {
-      console.log("onSettled");
+      queryClient.invalidateQueries("todos");
     },
   });
 
@@ -45,7 +45,7 @@ const Todo = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    addMutation.mutate(name);
+    addMutation.mutate({ name, isCompleted: false });
   };
 
   const handleCheckChange = (todo) => {

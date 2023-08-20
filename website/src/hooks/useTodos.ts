@@ -6,7 +6,7 @@ export const useTodos = () => {
     return res.data;
   };
 
-  const addTodo = async (name) => {
+  const addTodo = async ({ name, isCompleted }) => {
     const res = await fetch("http://localhost:3001/todos/create", {
       method: "POST",
       headers: {
