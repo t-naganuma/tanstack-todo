@@ -1,11 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 const fetchTodos = async () => {
-  const res = await fetch("http://localhost:3001/todos");
-  if (!res.ok) {
-    throw new Error(`${res.status} ${res.statusText}`);
-  }
-  return res.json();
+  const res = await axios.get("http://localhost:3001/todos");
+  return res.data;
 };
 
 const Todo = () => {
